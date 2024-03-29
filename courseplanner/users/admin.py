@@ -6,13 +6,12 @@ from courseplanner.users.forms import (
     UserChangeForm,
     UserCreationForm,
 )
+from courseplanner.users.models import UserCourse
 
 User = get_user_model()
 
-
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
-
     form = UserChangeForm
     add_form = UserCreationForm
     fieldsets = (
@@ -20,3 +19,8 @@ class UserAdmin(auth_admin.UserAdmin):
     ) + auth_admin.UserAdmin.fieldsets
     list_display = ["username", "name", "is_superuser", "expectedGraduationYear", "expectedGraduationTerm"]
     search_fields = ["name", "expectedGraduationYear", "expectedGraduationTerm"]
+
+@admin.register(UserCourse)
+class UserCourseAdmin(admin.ModelAdmin):
+    list_display = ['user', 'code', 'name', 'credits', 'grade']
+    search_fields = ['code', 'name']
