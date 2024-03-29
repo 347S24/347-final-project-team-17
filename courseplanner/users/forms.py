@@ -1,16 +1,46 @@
+from django import forms as form
 from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from .models import Term
+
 
 User = get_user_model()
 
+# Grad year calculation
+def get_graduation_years():
+    current_year = timezone.now().year
+    return [(year, str(year)) for year in range(current_year, current_year + 8)]
 
 class UserChangeForm(forms.UserChangeForm):
+
+    expectedGraduationYear = form.TypedChoiceField(
+        coerce=int,
+        choices=get_graduation_years(),
+        empty_value=None
+    )
+
+    expectedGraduationTerm = form.ChoiceField(choices=Term.choices)
+
     class Meta(forms.UserChangeForm.Meta):
         model = User
+        fields = '__all__' # can customize to include fields
+
+    def __init__(self, *args, **kwargs):
+        super(UserChangeForm, self).__init__(*args, **kwargs)
+        self.fields['expectedGraduationYear'].choices = get_graduation_years()
 
 
 class UserCreationForm(forms.UserCreationForm):
+
+    expectedGraduationYear = form.TypedChoiceField(
+        coerce=int,
+        choices=get_graduation_years(),
+        empty_value=None
+    )
+
+    expectedGraduationTerm = form.ChoiceField(choices=Term.choices)
 
     error_message = forms.UserCreationForm.error_messages.update(
         {
@@ -22,6 +52,11 @@ class UserCreationForm(forms.UserCreationForm):
 
     class Meta(forms.UserCreationForm.Meta):
         model = User
+        fields = ('username', 'expectedGraduationYear', 'expectedGraduationTerm')  # Include the fields you want on the signup form
+
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.fields['expectedGraduationYear'].choices = get_graduation_years()
 
     def clean_username(self):
         username = self.cleaned_data["username"]
