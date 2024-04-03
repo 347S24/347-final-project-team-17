@@ -2,16 +2,11 @@ from django import forms as form
 from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 from .models import Term
+from ..utils.utils import get_graduation_years
 
 
 User = get_user_model()
-
-# Grad year calculation
-def get_graduation_years():
-    current_year = timezone.now().year
-    return [(year, str(year)) for year in range(current_year, current_year + 8)]
 
 class UserChangeForm(forms.UserChangeForm):
 

@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
+from ..utils.utils import get_graduation_years
 
 class Term(models.TextChoices):
     FALL = 'FALL', _('Fall')
@@ -31,21 +31,22 @@ class Grade(models.TextChoices):
 
 class User(AbstractUser):
 
-    # First Name and Last Name Do Not Cover Name Patterns
-    # Around the Globe.
     name = models.CharField(
         _("Name of User"), blank=True, max_length=255
     )
     # GradYear
+    POSSIBLE_YEARS = get_graduation_years()
     expectedGraduationYear = models.IntegerField(
-        default=timezone.now().year
-        )
+        choices=POSSIBLE_YEARS, 
+        blank=True)
     # GradTerm
     expectedGraduationTerm = models.CharField(
         max_length=6,
         choices=Term.choices,
-        default=Term.FALL,
+        blank=True,
     )
+
+    file = models.FileField(upload_to='excel_files/', blank=True, null=True)
 
 
 
