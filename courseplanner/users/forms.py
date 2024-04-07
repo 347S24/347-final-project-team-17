@@ -2,8 +2,10 @@ from django import forms as form
 from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import FileExtensionValidator
 from .models import Term
 from ..utils.utils import get_graduation_years
+
 
 
 User = get_user_model()
@@ -64,3 +66,18 @@ class UserCreationForm(forms.UserCreationForm):
         raise ValidationError(
             self.error_messages["duplicate_username"]
         )
+
+class UserUpdateForm(form.ModelForm):
+    class Meta:
+        model = User
+        fields = ['expectedGraduationTerm', 'expectedGraduationYear', 'file']
+        labels = {
+            'expectedGraduationTerm' : 'Expected Graduation Term',
+            'expectedGraduationYear' : 'Expected Graduation Year',
+            'file' : 'Upload Template'
+        }
+
+class TranscriptUploadForm(form.Form):
+    transcript = form.FileField(label='(optional) Upload transcript here. This will overwrite current courses.', 
+                                validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
+                                required=False)

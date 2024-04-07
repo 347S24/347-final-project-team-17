@@ -5,13 +5,19 @@
 
 {% block content %}
   <h1>{{ user.username }}</h1>
-  <form class="form-horizontal" method="post" action="{% url 'users:update' %}" enctype="multipart/form-data">
+
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form|crispy }}
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn btn-primary">Update</button>
-      </div>
-    </div>
+    {{ update_form|crispy }}
+    <button type="submit" name="user_update_submit" class="btn btn-primary">Update</button>
   </form>
+
+  <br>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ transcript_form|crispy }}
+    <button type="submit" name="transcript_upload_submit" class="btn btn-primary">Upload Transcript</button>
+  </form>
+
 {% endblock %}

@@ -38,11 +38,13 @@ class User(AbstractUser):
     POSSIBLE_YEARS = get_graduation_years()
     expectedGraduationYear = models.IntegerField(
         choices=POSSIBLE_YEARS, 
-        blank=True)
+        null=True,
+        blank=True,)
     # GradTerm
     expectedGraduationTerm = models.CharField(
         max_length=6,
         choices=Term.choices,
+        null=True,
         blank=True,
     )
 
@@ -58,9 +60,8 @@ class User(AbstractUser):
 class UserCourse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
     code = models.CharField(max_length=10, verbose_name=_('Course Code'))
-    name = models.CharField(max_length=255, verbose_name=_('Course Name'))
     credits = models.IntegerField(verbose_name=_('Credits'))
-    grade = models.CharField(max_length=2, choices=Grade.choices, verbose_name=_('Grade'))
+    grade = models.CharField(max_length=2, choices=Grade.choices, verbose_name=_('Grade'), null=True)
 
     def __str__(self):
-        return f'{self.code} - {self.name}'
+        return f'({self.credits}) {self.code} - {self.grade}'

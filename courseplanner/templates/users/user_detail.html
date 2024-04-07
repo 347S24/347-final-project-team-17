@@ -21,12 +21,21 @@
 <div class="row">
 
   <div class="col-sm-12">
-    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
+    <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">Edit Profile</a>
     <a class="btn btn-primary" href="{% url 'account_email' %}" role="button">E-Mail</a>
     <!-- Your Stuff: Custom user template urls -->
   </div>
 
 </div>
+
+<br>
+<h3>User Courses</h3>
+<ul>
+  {% for user_course in user_courses %}
+      <li>{{ user_course }}</li>
+      <!-- Add other course information as needed -->
+  {% endfor %}
+</ul>
 <!-- End Action buttons -->
 {% endif %}
 

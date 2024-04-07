@@ -22,5 +22,5 @@ class UserAdmin(auth_admin.UserAdmin):
 
 @admin.register(UserCourse)
 class UserCourseAdmin(admin.ModelAdmin):
-    list_display = ['user', 'code', 'name', 'credits', 'grade']
-    search_fields = ['code', 'name']
+    list_display = ['user', 'code', 'credits', 'grade']
+    search_fields = ['code']
