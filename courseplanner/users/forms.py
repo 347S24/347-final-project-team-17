@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import FileExtensionValidator
-from .models import Term
+from .models import Term, UserCourse
 from ..utils.utils import get_graduation_years
 
 
@@ -78,6 +78,17 @@ class UserUpdateForm(form.ModelForm):
         }
 
 class TranscriptUploadForm(form.Form):
-    transcript = form.FileField(label='(optional) Upload transcript here. This will overwrite current courses.', 
+    transcript = form.FileField(label='(optional) Upload transcript here. This will overwrite current courses.',
                                 validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
                                 required=False)
+
+
+class CourseInputForm(form.ModelForm):
+        class Meta:
+            model = UserCourse
+            fields = ['code', 'credits', 'grade']
+            labels = {
+                'code': 'Course',
+                'credits': 'Credits',
+                'grade': 'Grade',
+            }

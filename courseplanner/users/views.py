@@ -10,6 +10,7 @@ from django.views.generic import (
     TemplateView,
 )
 from .forms import (
+    CourseInputForm,
     UserUpdateForm,
     TranscriptUploadForm,
 )
@@ -38,13 +39,14 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 user_detail_view = UserDetailView.as_view()
 
 class UserUpdateView(LoginRequiredMixin, TemplateView):
-    
+
     template_name = "users/user_form.html"
 
     def post(self, request, *args, **kwargs):
         user = request.user
         update_form = UserUpdateForm(request.POST, request.FILES, instance=user)
         transcript_form = TranscriptUploadForm(request.POST, request.FILES)
+        course_form = CourseInputForm(request.POST or None)
 
         if "user_update_submit" in request.POST:
             if update_form.is_valid():
@@ -61,13 +63,22 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                     UserCourse.objects.create(user=user, code=course[0], credits=course[1], grade=course[2])
                 messages.success(request, uploaded_file)
 
+        if "course_input_submit" in request.POST:
+            if course_form.is_valid():
+                new_course = course_form.save(commit=False)
+                new_course.user = user
+                new_course.save()
+                messages.success(request, "Course added successfully!")
+                return redirect(request.path_info)
+
         messages.success(request, "Success!")
-        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form})
+        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form})
 
     def get(self, request, *args, **kwargs):
         update_form = UserUpdateForm(instance=request.user)
         transcript_form = TranscriptUploadForm
-        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form})
+        course_form = CourseInputForm()
+        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form})
 
     # Consider using this to reduce if branching?
     # def form_valid(self, form):
@@ -91,3 +102,4 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
