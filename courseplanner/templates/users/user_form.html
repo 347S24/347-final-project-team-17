@@ -28,4 +28,32 @@
   <button type="submit" name="course_input_submit" class="btn btn-primary">Add Course</button>
 </form>
 
+<style>
+  .remove-course-btn {
+    border: none;
+    background-color: transparent;
+    color: red;
+    cursor: pointer;
+  }
+
+  .remove-course-btn:hover {
+    color: darkred;
+  }
+</style>
+
+<h3>My Courses</h3>
+<ul>
+  {% for course in user_courses %}
+    <li>{{ course.code }} - {{ course.credits }} Credits - Grade: {{ course.grade }}
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="course_id" value="{{ course.id }}">
+        <button type="submit" name="remove_course_submit" class="remove-course-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+
 {% endblock %}

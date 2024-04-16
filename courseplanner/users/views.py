@@ -47,6 +47,7 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
         update_form = UserUpdateForm(request.POST, request.FILES, instance=user)
         transcript_form = TranscriptUploadForm(request.POST, request.FILES)
         course_form = CourseInputForm(request.POST or None)
+        user_courses = UserCourse.objects.filter(user=user)
 
         if "user_update_submit" in request.POST:
             if update_form.is_valid():
@@ -71,14 +72,23 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 messages.success(request, "Course added successfully!")
                 return redirect(request.path_info)
 
+        if "remove_course_submit" in request.POST:
+            course_id = request.POST.get("course_id")
+            if course_id:
+                UserCourse.objects.filter(id=course_id, user=user).delete()
+                messages.success(request, "Course removed successfully!")
+                return redirect(request.path_info)
+
         messages.success(request, "Success!")
-        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form})
+        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
 
     def get(self, request, *args, **kwargs):
+        user = request.user
         update_form = UserUpdateForm(instance=request.user)
         transcript_form = TranscriptUploadForm
         course_form = CourseInputForm()
-        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form})
+        user_courses = UserCourse.objects.filter(user=user)
+        return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
 
     # Consider using this to reduce if branching?
     # def form_valid(self, form):
