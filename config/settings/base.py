@@ -270,16 +270,15 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool(
 )
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = "username"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_ADAPTER = "courseplanner.users.adapters.AccountAdapter"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = (
     "courseplanner.users.adapters.SocialAccountAdapter"
 )
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+ACCOUNT_FORMS = {
+    'signup': 'courseplanner.users.forms.CustomSignupForm',
+}

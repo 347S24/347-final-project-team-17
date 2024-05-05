@@ -10,12 +10,31 @@
 
 <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
 
+<!-- {{ form|crispy }} -->
+
 <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
   {% csrf_token %}
-  {{ form|crispy }}
-  {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %}
+  {{ form.non_field_errors }}
+
+  {{ form.email|as_crispy_field }}
+  {{ form.username|as_crispy_field }}
+  {{ form.password1|as_crispy_field }}
+  {{ form.password2|as_crispy_field }}
+
+  <div class="fieldWrapper">
+    <label class="form-label">{% trans "Expected Graduation" %}</label>
+    <div class="form-group row">
+      <div class="col-sm-5">
+        {{ form.expected_grad_year.errors|as_crispy_errors }}
+        {{ form.expected_grad_year }}
+      </div>
+      <div class="col-sm-5">
+        {{ form.expected_grad_term.errors|as_crispy_errors }}
+        {{ form.expected_grad_term }}
+      </div>
+    </div>
+  </div>
+
   <button class="btn btn-primary" type="submit">{% trans "Sign Up" %} &raquo;</button>
 </form>
 

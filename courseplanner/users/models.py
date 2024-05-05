@@ -29,28 +29,20 @@ class Grade(models.TextChoices):
     WITHDRAWFAIL = 'WF', _('Withdraw Fail')
     WITHDRAWPASS = 'WP', _('Withdraw Pass')
 
+# The degree requirements consist of
+# 1) General Education
+# 2) Quantitative Requirements
+# 3) Major (Curriculum) Requirements
+# 4) University Elective Requirements (meet 120 credits)
 class User(AbstractUser):
 
-    name = models.CharField(
-        _("Name of User"), blank=True, max_length=255
-    )
-    # GradYear
-    POSSIBLE_YEARS = get_graduation_years()
-    expectedGraduationYear = models.IntegerField(
-        choices=POSSIBLE_YEARS, 
-        null=True,
-        blank=True,)
-    # GradTerm
-    expectedGraduationTerm = models.CharField(
-        max_length=6,
-        choices=Term.choices,
-        null=True,
-        blank=True,
-    )
+    name = models.CharField(_("Name of User"), blank=True, max_length=255) # redundant field
+    GRAD_YEARS = get_graduation_years()
+    expected_grad_year = models.IntegerField(choices=GRAD_YEARS, null=True)
+    expected_grad_term = models.CharField(choices=Term.choices, null=True, max_length=6)
 
-    file = models.FileField(upload_to='excel_files/', blank=True, null=True)
-
-
+    file = models.FileField(upload_to='excel_files/', blank=True, null=True,
+                            help_text="Upload your completed excel template. You may download a template on the home page.")
 
     def get_absolute_url(self):
         return reverse(
@@ -65,3 +57,39 @@ class UserCourse(models.Model):
 
     def __str__(self):
         return f'({self.credits}) {self.code} - {self.grade}'
+
+class CourseTerm(models.Model):
+    TERM_CHOICES = Term.choices
+
+    name = models.CharField(max_length=20, choices=TERM_CHOICES, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Course(models.Model):
+    code = models.CharField(max_length=10, unique=True, verbose_name=_('Course Code'))
+    name = models.CharField(max_length=40)
+    description = models.TextField()
+    credits = models.PositiveIntegerField()
+    offered = models.ManyToManyField(CourseTerm)
+    prerequisites = models.ManyToManyField('self', related_name="prereqs", symmetrical=False, blank=True)
+    corequisites = models.ManyToManyField('self', related_name="coreqs", symmetrical=False, blank=True)
+
+
+    def __str__(self):
+        return f'{self.code}'
+
+class Curriculum(models.Model):
+    PROGRAM_TYPES = [
+        ('MAJ', 'Major'),
+        ('MIN', 'Minor'),
+        ('CERT', 'Certificate'),
+        ('TRCK', 'Interest Track'),
+    ]
+
+    name = models.CharField(max_length=40)
+    required_courses = models.ManyToManyField(Course)
+    program_type = models.CharField(max_length=4, choices=PROGRAM_TYPES, default='MAJ')
+
+    def __str__(self):
+        return self.name

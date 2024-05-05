@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model, forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import FileExtensionValidator
+from allauth.account.forms import SignupForm
 from .models import Term, UserCourse
 from ..utils.utils import get_graduation_years
 
@@ -12,13 +13,13 @@ User = get_user_model()
 
 class UserChangeForm(forms.UserChangeForm):
 
-    expectedGraduationYear = form.TypedChoiceField(
+    expected_grad_year = form.TypedChoiceField(
         coerce=int,
         choices=get_graduation_years(),
         empty_value=None
     )
 
-    expectedGraduationTerm = form.ChoiceField(choices=Term.choices)
+    expected_grad_term = form.ChoiceField(choices=Term.choices)
 
     class Meta(forms.UserChangeForm.Meta):
         model = User
@@ -26,18 +27,18 @@ class UserChangeForm(forms.UserChangeForm):
 
     def __init__(self, *args, **kwargs):
         super(UserChangeForm, self).__init__(*args, **kwargs)
-        self.fields['expectedGraduationYear'].choices = get_graduation_years()
+        self.fields['expected_grad_year'].choices = get_graduation_years()
 
 
 class UserCreationForm(forms.UserCreationForm):
 
-    expectedGraduationYear = form.TypedChoiceField(
+    expected_grad_year = form.TypedChoiceField(
         coerce=int,
         choices=get_graduation_years(),
         empty_value=None
     )
 
-    expectedGraduationTerm = form.ChoiceField(choices=Term.choices)
+    expected_grad_term = form.ChoiceField(choices=Term.choices)
 
     error_message = forms.UserCreationForm.error_messages.update(
         {
@@ -49,11 +50,11 @@ class UserCreationForm(forms.UserCreationForm):
 
     class Meta(forms.UserCreationForm.Meta):
         model = User
-        fields = ('username', 'expectedGraduationYear', 'expectedGraduationTerm')  # Include the fields you want on the signup form
+        fields = ('username', 'expected_grad_year', 'expected_grad_term')  # Include the fields you want on the signup form
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        self.fields['expectedGraduationYear'].choices = get_graduation_years()
+        self.fields['expected_grad_year'].choices = get_graduation_years()
 
     def clean_username(self):
         username = self.cleaned_data["username"]
@@ -70,17 +71,18 @@ class UserCreationForm(forms.UserCreationForm):
 class UserUpdateForm(form.ModelForm):
     class Meta:
         model = User
-        fields = ['expectedGraduationTerm', 'expectedGraduationYear', 'file']
+        fields = ['expected_grad_term', 'expected_grad_year', 'file']
         labels = {
-            'expectedGraduationTerm' : 'Expected Graduation Term',
-            'expectedGraduationYear' : 'Expected Graduation Year',
             'file' : 'Upload Template'
         }
 
 class TranscriptUploadForm(form.Form):
-    transcript = form.FileField(label='(optional) Upload transcript here. This will overwrite current courses.',
-                                validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
-                                required=False)
+    transcript = form.FileField(
+        label='Upload Transcript',
+        validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
+        required=False,
+        help_text="This will overwrite current courses."
+    )
 
 
 class CourseInputForm(form.ModelForm):
@@ -88,7 +90,33 @@ class CourseInputForm(form.ModelForm):
             model = UserCourse
             fields = ['code', 'credits', 'grade']
             labels = {
-                'code': 'Course',
+                'code': 'Course Code',
                 'credits': 'Credits',
                 'grade': 'Grade',
             }
+
+class CustomSignupForm(SignupForm):
+    POSSIBLE_YEARS = get_graduation_years()
+    expected_grad_year = form.ChoiceField(
+        choices=[('', 'Select Year')] + POSSIBLE_YEARS,
+        required=True,
+    )
+    expected_grad_term = form.ChoiceField(choices=[('', 'Select Term')] + Term.choices)
+
+    def clean_expected_grad_year(self):
+        value = self.cleaned_data.get('expected_grad_year')
+        if value == '':
+            return None  # Skip validation for blank value
+        return value
+
+    def clean_expected_grad_term(self):
+        value = self.cleaned_data.get('expected_grad_term')
+        if value == '':
+            return None  # Skip validation for blank value
+        return value
+
+    def save(self, request):
+        user = super(CustomSignupForm, self).save(request)
+        user.expected_grad_year = self.cleaned_data['expected_grad_year']
+        user.save()
+        return user

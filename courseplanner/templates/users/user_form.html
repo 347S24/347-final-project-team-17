@@ -1,18 +1,37 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load i18n %}
 
-{% block title %}{{ user.username }}{% endblock %}
+{% block title %}Edit Profile | {{ user.username }}{% endblock %}
 
 {% block content %}
-  <h1>{{ user.username }}</h1>
+  <h1>Profile Setup</h1>
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ update_form|crispy }}
-    <button type="submit" name="user_update_submit" class="btn btn-primary">Update</button>
+    <!-- {{ update_form|crispy }} -->
+
+    {{ update_form.file|as_crispy_field }}
+    <div class="fieldWrapper">
+      <label class="form-label">{% trans "Expected Graduation" %}</label>
+      <div class="form-group row">
+        <div class="col-sm-5">
+          {{ update_form.expected_grad_year.errors|as_crispy_errors }}
+          {{ update_form.expected_grad_year }}
+        </div>
+        <div class="col-sm-5">
+          {{ update_form.expected_grad_term.errors|as_crispy_errors }}
+          {{ update_form.expected_grad_term }}
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" name="user_update_submit" class="btn btn-primary">Update Profile</button>
   </form>
 
-  <br>
+  <hr>
+
+  <h2>Add Courses</h2>
 
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -20,40 +39,76 @@
     <button type="submit" name="transcript_upload_submit" class="btn btn-primary">Upload Transcript</button>
   </form>
 
-<br>
+  <br>
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ course_form|crispy }}
-  <button type="submit" name="course_input_submit" class="btn btn-primary">Add Course</button>
-</form>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <!-- {{ course_form|crispy }} -->
+    <div class="fieldWrapper">
+        <div class="form-group row">
+        <div class="col-sm">
+          {{ course_form.code|as_crispy_field }}
+        </div>
+        <div class="col-sm">
+          {{ course_form.credits|as_crispy_field }}
+        </div>
+        <div class="col-sm">
+          {{ course_form.grade|as_crispy_field }}
+        </div>
+        <div class="col-sm">
+          <br id="pseudo-label">
+          <div>
+            <button aria-label="add course" type="submit" name="course_input_submit" class="btn btn-secondary"><i class="fas fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 
-<style>
-  .remove-course-btn {
-    border: none;
-    background-color: transparent;
-    color: red;
-    cursor: pointer;
-  }
+  <style>
+    .remove-course-btn {
+      border: none;
+      background-color: transparent;
+      color: red;
+      cursor: pointer;
+    }
 
-  .remove-course-btn:hover {
-    color: darkred;
-  }
-</style>
+    .remove-course-btn:hover {
+      color: darkred;
+    }
+    
+    #pseudo-label {
+      margin-bottom: .5rem;
+    }
+  </style>
 
-<h3>My Courses</h3>
-<ul>
-  {% for course in user_courses %}
-    <li>{{ course.code }} - {{ course.credits }} Credits - Grade: {{ course.grade }}
-      <form method="post" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="course_id" value="{{ course.id }}">
-        <button type="submit" name="remove_course_submit" class="remove-course-btn">
-          <i class="fas fa-times"></i>
-        </button>
-      </form>
-    </li>
-  {% endfor %}
-</ul>
+<table class="table table-striped ">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Course Code</th>
+      <th scope="col">Credits</th>
+      <th scope="col">Grade</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in user_courses %}
+      <tr>
+        <th scope="row">
+          <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="course_id" value="{{ course.id }}">
+            <button aria-label="remove course" type="submit" name="remove_course_submit" class="remove-course-btn">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        </th>
+        <td>{{ course.code }}</td>
+        <td>{{ course.credits }}</td>
+        <td>{{ course.grade }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
