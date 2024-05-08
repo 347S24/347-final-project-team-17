@@ -5,10 +5,10 @@ from django.utils.translation import gettext_lazy as _
 from ..utils.utils import get_graduation_years
 
 class Term(models.TextChoices):
-    FALL = 'FALL', _('Fall')
-    SPRING = 'SPRING', _('Spring')
-    SUMMER = 'SUMMER', _('Summer')
-    WINTER = 'WINTER', _('Winter')
+    FALL = 'Fall', _('Fall')
+    SPRING = 'Spring', _('Spring')
+    SUMMER = 'Summer', _('Summer')
+    WINTER = 'Winter', _('Winter')
 
 class Grade(models.TextChoices):
     A = 'A', _('A')

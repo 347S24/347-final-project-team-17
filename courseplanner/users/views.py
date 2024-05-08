@@ -78,6 +78,11 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 UserCourse.objects.filter(id=course_id, user=user).delete()
                 messages.success(request, "Course removed successfully!")
                 return redirect(request.path_info)
+            
+        if "remove_all_submit" in request.POST:
+            UserCourse.objects.filter(user=user).delete()
+            messages.success(request, "All courses removed successfully!")
+            return redirect(request.path_info)
 
         messages.success(request, "Success!")
         return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
