@@ -88,8 +88,11 @@ class TranscriptUploadForm(form.Form):
 class CourseInputForm(form.ModelForm):
         class Meta:
             model = UserCourse
-            fields = ['code', 'credits', 'grade']
+            fields = ['year', 'semester', 'code', 'credits', 'grade']
             labels = {
+                'year': 'Year',
+                'semester': 'Semester',
+                'grade': 'Grade',
                 'code': 'Course Code',
                 'credits': 'Credits',
                 'grade': 'Grade',

@@ -61,7 +61,7 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 courses = extract_course_info(uploaded_file)
                 UserCourse.objects.filter(user=user).delete()
                 for course in courses:
-                    UserCourse.objects.create(user=user, code=course[0], credits=course[1], grade=course[2])
+                    UserCourse.objects.create(user=user, year=course[0], semester=course[1], code=course[2], credits=course[3], grade=course[4])
                 messages.success(request, uploaded_file)
 
         if "course_input_submit" in request.POST:

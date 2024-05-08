@@ -47,6 +47,12 @@
     <div class="fieldWrapper">
         <div class="form-group row">
         <div class="col-sm">
+          {{ course_form.year|as_crispy_field }}
+        </div>
+        <div class="col-sm">
+          {{ course_form.semester|as_crispy_field }}
+        </div>
+        <div class="col-sm">
           {{ course_form.code|as_crispy_field }}
         </div>
         <div class="col-sm">
@@ -86,6 +92,8 @@
   <thead class="thead-dark">
     <tr>
       <th scope="col"></th>
+      <th scope="col">Year</th>
+      <th scope="col">Semester</th>
       <th scope="col">Course Code</th>
       <th scope="col">Credits</th>
       <th scope="col">Grade</th>
@@ -103,6 +111,8 @@
             </button>
           </form>
         </th>
+        <td>{{ course.year }}</td>
+        <td>{{ course.semester }}</td>
         <td>{{ course.code }}</td>
         <td>{{ course.credits }}</td>
         <td>{{ course.grade }}</td>
