@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 
 from courseplanner.users.views import (
     user_redirect_view,
