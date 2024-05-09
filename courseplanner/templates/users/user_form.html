@@ -4,6 +4,12 @@
 
 {% block title %}Edit Profile | {{ user.username }}{% endblock %}
 
+{% block extra_js %}
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+{% endblock %}
+
 {% block content %}
   <h1>Profile Setup</h1>
 
@@ -13,7 +19,7 @@
 
     {{ update_form.file|as_crispy_field }}
     <div class="fieldWrapper">
-      <label class="form-label">{% trans "Expected Graduation" %}</label>
+      <label class="form-label">{% trans "Expected Graduation*" %}</label>
       <div class="form-group row">
         <div class="col-sm-5">
           {{ update_form.expected_grad_year.errors|as_crispy_errors }}
@@ -24,6 +30,7 @@
           {{ update_form.expected_grad_term }}
         </div>
       </div>
+      {{ update_form.curriculums|as_crispy_field }}
     </div>
 
     <button type="submit" name="user_update_submit" class="btn btn-primary">Update Profile</button>
@@ -47,7 +54,9 @@
     <div class="fieldWrapper">
         <div class="form-group row">
         <div class="col-sm">
-          {{ course_form.code|as_crispy_field }}
+          <div class="autocomplete-field">
+            {{ course_form.code|as_crispy_field }}
+          </div>
         </div>
         <div class="col-sm">
           {{ course_form.credits|as_crispy_field }}
@@ -110,5 +119,15 @@
     {% endfor %}
   </tbody>
 </table>
+
+{#% For autocompletion %#}
+<script>
+  $(function() {
+      $("#id_name").autocomplete({
+          source: "{% url 'users:autocomplete_course_codes' %}",
+      });
+  });
+</script>
+
 
 {% endblock %}

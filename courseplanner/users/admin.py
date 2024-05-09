@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.shortcuts import render
+from django.utils.html import format_html
 
 from courseplanner.users.forms import (
     UserChangeForm,
@@ -8,8 +12,10 @@ from courseplanner.users.forms import (
 )
 from courseplanner.users.models import (
     UserCourse,
-    Course,
     CourseTerm,
+    Course,
+    CourseGroup,
+    Requirement,
     Curriculum,
 )
 
@@ -30,6 +36,8 @@ class UserCourseAdmin(admin.ModelAdmin):
     list_display = ['user', 'code', 'credits', 'grade']
     search_fields = ['code']
 
+admin.site.register(CourseTerm)
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
 
@@ -43,9 +51,34 @@ class CourseAdmin(admin.ModelAdmin):
     ordering = ['code']
     filter_horizontal = ('prerequisites','corequisites','offered')
 
-admin.site.register(CourseTerm)
+class CourseInline(admin.StackedInline):
+    model = Course
+    extra = 1
+
+class CourseGroupInline(admin.TabularInline):
+    model = CourseGroup
+    filter_horizontal = ['requirements']
+    extra = 1
+
+class RequirementInline(admin.TabularInline):
+    model = Curriculum.requirements.through
+    extra = 1
+
+@admin.register(Requirement)
+class RequirementAdmin(admin.ModelAdmin):
+    inlines = [CourseInline, CourseGroupInline]
 
 @admin.register(Curriculum)
 class CurriculumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'program_type']
-    filter_horizontal = ['required_courses']
+    list_display = ['name', 'program_type', 'representation']
+    filter_horizontal = ['requirements']
+
+    def representation(self, obj):
+
+        print(obj.display())
+        return format_html(obj.display().replace('\n', '<br/>').replace('\t', '|---'))
+
+
+
+    representation.short_description = 'Visualization'
+    representation.allow_tags = True

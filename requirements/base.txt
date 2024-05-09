@@ -6,6 +6,8 @@ unidecode==1.1.1 # https://pypi.org/project/Unidecode/
 
 # CoursePlanner
 PyPDF2==3.0.1 # https://pypi.org/project/PyPDF2/
+networkx==3.0 # https://pypi.org/project/networkx/
+matplotlib==3.7.5 # https://pypi.org/project/matplotlib/
 
 # Django
 # ------------------------------------------------------------------------------

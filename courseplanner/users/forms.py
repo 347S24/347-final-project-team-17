@@ -6,6 +6,8 @@ from django.core.validators import FileExtensionValidator
 from allauth.account.forms import SignupForm
 from .models import Term, UserCourse
 from ..utils.utils import get_graduation_years
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Field
 
 
 
@@ -71,9 +73,13 @@ class UserCreationForm(forms.UserCreationForm):
 class UserUpdateForm(form.ModelForm):
     class Meta:
         model = User
-        fields = ['expected_grad_term', 'expected_grad_year', 'file']
+        fields = ['expected_grad_term', 'expected_grad_year', 'file', 'curriculums']
         labels = {
-            'file' : 'Upload Template'
+            'file' : 'Upload Template',
+            'curriculums' : 'Plan(s) of Study',
+        }
+        widgets = {
+            'curriculums': form.SelectMultiple(attrs={'class': 'form-control'}),
         }
 
 class TranscriptUploadForm(form.Form):
@@ -86,14 +92,27 @@ class TranscriptUploadForm(form.Form):
 
 
 class CourseInputForm(form.ModelForm):
-        class Meta:
-            model = UserCourse
-            fields = ['code', 'credits', 'grade']
-            labels = {
-                'code': 'Course Code',
-                'credits': 'Credits',
-                'grade': 'Grade',
-            }
+        
+    # Customize crispy forms layout to include 
+    def __init__(self, *args, **kwargs):
+        super(CourseInputForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Submit'))
+        self.helper.layout = Layout(
+            Field('code', css_class='autocomplete'),
+            Field('credits'),
+            Field('grade'),
+        )
+
+    class Meta:
+        model = UserCourse
+        fields = ['code', 'credits', 'grade']
+        labels = {
+            'code': 'Course Code',
+            'credits': 'Credits',
+            'grade': 'Grade',
+        }
 
 class CustomSignupForm(SignupForm):
     POSSIBLE_YEARS = get_graduation_years()

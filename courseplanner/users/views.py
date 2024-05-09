@@ -1,8 +1,8 @@
 from typing import Any
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import (
     DetailView,
@@ -15,9 +15,12 @@ from .forms import (
     TranscriptUploadForm,
 )
 from .models import (
-    UserCourse
+    UserCourse,
+    Course,
 )
 from ..utils.utils import extract_course_info
+from ..utils.course_util import generate_course_plan
+
 from django.contrib import messages
 
 User = get_user_model()
@@ -55,14 +58,13 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 return redirect(request.path_info)
 
         if "transcript_upload_submit" in request.POST:
-            messages.warning(request, "Attempting to validate")
             if transcript_form.is_valid():
                 uploaded_file = transcript_form.cleaned_data['transcript']
                 courses = extract_course_info(uploaded_file)
                 UserCourse.objects.filter(user=user).delete()
                 for course in courses:
                     UserCourse.objects.create(user=user, code=course[0], credits=course[1], grade=course[2])
-                messages.success(request, uploaded_file)
+                messages.success(request, f'{uploaded_file} uploaded successfully')
 
         if "course_input_submit" in request.POST:
             if course_form.is_valid():
@@ -79,7 +81,6 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 messages.success(request, "Course removed successfully!")
                 return redirect(request.path_info)
 
-        messages.success(request, "Success!")
         return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
 
     def get(self, request, *args, **kwargs):
@@ -88,6 +89,7 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
         transcript_form = TranscriptUploadForm
         course_form = CourseInputForm()
         user_courses = UserCourse.objects.filter(user=user)
+
         return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
 
     # Consider using this to reduce if branching?
@@ -100,6 +102,30 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
 
 user_update_view = UserUpdateView.as_view()
 
+# Autocomplete for UserUpdateView querying course codes.
+def autocomplete_course_codes(request):
+    term = request.GET.get('term')
+    courses = Course.objects.filter(name__icontains=term)
+    course_codes = [course.code for course in courses]
+    return JsonResponse(course_codes, safe=False)
+                  
+class UserPlanView(LoginRequiredMixin, TemplateView):
+    template_name = 'pages/plan.html'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     user = self.request.user
+    #     semesters, graph = generate_course_plan(user.curriculums.all(), 16)
+    #     context['semesters'] = semesters
+    #     context['graph'] = graph
+    #     return context
+    
+    def post(self, request, *args, **kwargs):
+        user = self.request.user
+        semesters, graph = generate_course_plan(user.curriculums.all(), 16)
+        return render(request, self.template_name, {'semesters': semesters, 'graph': graph})
+
+user_plan_view = UserPlanView.as_view()
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
     permanent = False

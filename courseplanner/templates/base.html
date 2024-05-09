@@ -26,6 +26,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     {% endblock %}
 
+    {% block extra_js %}{% endblock %}
+
   </head>
 
   <body>
@@ -43,12 +45,12 @@
               <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'about' %}">About</a>
+              <a class="nav-link" href="{% url 'users:plan' %}">Planner</a>
             </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
-                <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "My Profile" %}</a>
+                <a class="nav-link" href="{% url 'users:detail' request.user.username  %}">{% trans "Settings" %}</a>
               </li>
               <li class="nav-item">
                 {# URL provided by django-allauth/account/urls.py #}
@@ -79,7 +81,7 @@
       {% endif %}
 
       {% block content %}
-        <p>CS* Course Planner This text is inherited on other pages!</p>
+        <p>CS* Course Planner. This must be a new page, typically this { block content } is overwritten by other templates.</p>
       {% endblock content %}
 
     </div> <!-- /container -->
