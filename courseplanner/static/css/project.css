@@ -11,3 +11,56 @@
   background-color: #f2dede;
   border-color: #eed3d7;
 }
+h1.display-4 {
+  font-size: 3rem; /* Larger font size */
+  font-weight: bold; /* Bolder font for emphasis */
+}
+
+.jumbotron {
+  padding: 2rem 1rem; /* More padding for better spacing */
+  background: linear-gradient(to right, #6a11cb, #2575fc); /* Background gradient */
+  color: white; /* Better contrast with darker background */
+  background-size: cover;
+  background-position: center;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+a:hover, .btn:hover {
+    opacity: 0.8;
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e7e7e7;
+}
+
+.key-features-header {
+    margin-bottom: 2rem; /* Adjust the value as needed */
+}
+
+/* Sticky footer styles */
+html, body {
+    height: 100%; /* Full height */
+    margin: 0;
+}
+
+.container {
+    min-height: 100%; /* Minimum height to take full viewport */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+footer {
+    margin-top: auto; /* Pushes the footer to the bottom */
+    background-color: #f8f9fa; /* Footer background color */
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e7e7e7;
+}

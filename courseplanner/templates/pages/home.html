@@ -4,19 +4,51 @@
 {% block title %}Home - CoursePlanner{% endblock title %}
 
 {% block content %}
-<div class="jumbotron">
-  <h1 class="display-4">Welcome to CoursePlanner!</h1>
-  <p class="lead">Plan and organize your courses effortlessly.</p>
-  <hr class="my-4">
+<div class="container"> <!-- This should wrap all content except the footer -->
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to CoursePlanner!</h1>
+        <p class="lead">Plan and organize your courses effortlessly.</p>
+        <hr class="my-4">
 
-  {% if request.user.is_authenticated %}
-  <p>
-    Download the <a href="{% static 'excel/template.xlsx' %}" class="btn btn-primary btn-lg" role="button">Excel Template</a> to get started.
-  </p>
-  {% else %}
-  <p>
-    Please <a href="{% url 'account_login' %}">Sign In</a> or <a href="{% url 'account_signup' %}">Sign Up</a> to download the Excel Template and start planning your courses.
-  </p>
-  {% endif %}
+        {% if request.user.is_authenticated %}
+        <p>
+            Download the <a href="{% static 'excel/template.xlsx' %}" class="btn btn-primary btn-lg" role="button">Excel Template</a> to get started.
+        </p>
+        {% else %}
+        <p>
+            Please <a href="{% url 'account_login' %}">Sign In</a> or <a href="{% url 'account_signup' %}">Sign Up</a> to download the Excel Template and start planning your courses.
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="container mt-5">
+        <h2 class="key-features-header">Features</h2>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-calendar-alt fa-3x"></i>
+                <p>Comprehensive Planning</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-book fa-3x"></i>
+                <p>Course Catalog</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-user-graduate fa-3x"></i>
+                <p>Graduation Tracking</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Footer -->
+<footer>
+    <p>© 2024 CoursePlanner. All rights reserved.</p>
+    <p>Follow us on:
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+    </p>
+</footer>
 {% endblock content %}
+
