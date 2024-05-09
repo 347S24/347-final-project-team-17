@@ -50,6 +50,13 @@ def find_all_header_pairs(worksheet, course_header="Course", credit_header="Cred
             header_pairs.append((row_idx, course_col, credit_col))
     return header_pairs
 
+def is_summer_above(worksheet, header_row, course_col):
+    """Check if 'Summer' is in any cell above the specified course column."""
+    for row_idx in range(1, header_row):
+        if worksheet.cell(row=row_idx, column=course_col).value == "Summer":
+            return True
+    return False
+
 def update_excel(file_path, output_path, course_header="Course", credit_header="Credit Hrs", min_row=1, max_row=100):
     # Create a copy of the original file
     shutil.copy(file_path, output_path)
@@ -69,6 +76,9 @@ def update_excel(file_path, output_path, course_header="Course", credit_header="
 
     # Fill each header pair
     for header_row, course_col, credit_col in header_pairs:
+        if is_summer_above(worksheet, header_row, course_col):
+            continue  # Skip this section if 'Summer' is detected above
+
         row_count = 0
         while total_credits < TARGET_CREDIT_HRS and row_count < MAX_ENTRIES and pair_index < len(course_credit_pairs):
             course, credit_hr = course_credit_pairs[pair_index]
