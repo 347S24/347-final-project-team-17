@@ -6,12 +6,13 @@ def get_graduation_years():
     current_year = timezone.now().year
     return [(year, str(year)) for year in range(current_year, current_year + 8)]
 
+
 # Returns a list of (code, credits, grade) tuples from the provided transcript.
 def extract_course_info(file):
 
     # Parses course info from transcript line of following format: 
     # "{course code} {course name} {attempted credits} {earned credits} {grade} {gpa points}"
-    def parse_course(line):
+    def parse_course(line, semester, year):
         if re.match(class_pattern, line):
 
             course_num = re.search(course_num_pattern, line).group()
@@ -21,7 +22,7 @@ def extract_course_info(file):
             if grade:
                 grade = grade.group()
 
-            return course_num, int(grade_info[0][0]), grade
+            return year, semester, course_num, int(grade_info[0][0]), grade
         return None
 
     # Open file in PyPDF2
@@ -32,7 +33,11 @@ def extract_course_info(file):
     course_num_pattern = re.compile(r'[A-Z]{2,5}\s(\d{3}|O{3})') # Match courses numbers
     grade_info_pattern = re.compile(r'\d{1,2}\.\d{2,3}') # Match credit hours
     grade_pattern = re.compile(r'(?<=\b\d\.\d\d)[A-Z\-+]*(?=\d+\.\d+\b)') # Match grade
+    semester_pattern = re.compile(r'(Spring|Summer|Fall|Winter) (Semester|Session) (\d{4})') # Match semester and year
 
+    curr_semester = None
+    curr_year = None
+    
     # Iterate through each page of the PDF
     for page_num in range(len(reader.pages)):
 
@@ -42,10 +47,15 @@ def extract_course_info(file):
 
         # Iterate through each line
         for line in lines:
-            result = parse_course(line)
+            # Check for semester information
+            semester_match = re.match(semester_pattern, line)
+            if semester_match:
+                curr_semester, _, curr_year = semester_match.groups()
+                continue
+
+            # Parse course information
+            result = parse_course(line, curr_semester, curr_year)
             if result:
                 classes += [result]
         
     return classes
-
-            

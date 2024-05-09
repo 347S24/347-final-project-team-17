@@ -6,10 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from ..utils.utils import get_graduation_years
 
 class Term(models.TextChoices):
-    FALL = 'FALL', _('Fall')
-    SPRING = 'SPRING', _('Spring')
-    SUMMER = 'SUMMER', _('Summer')
-    WINTER = 'WINTER', _('Winter')
+    FALL = 'Fall', _('Fall')
+    SPRING = 'Spring', _('Spring')
+    SUMMER = 'Summer', _('Summer')
+    WINTER = 'Winter', _('Winter')
 
 class Grade(models.TextChoices):
     A = 'A', _('A')
@@ -52,6 +52,9 @@ class User(AbstractUser):
         )
 
 class UserCourse(models.Model):
+    GRAD_YEARS = get_graduation_years()
+    year = models.IntegerField(choices=GRAD_YEARS, null=True)
+    semester = models.CharField(choices=Term.choices, null=True, max_length=6)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses')
     code = models.CharField(max_length=10, verbose_name=_('Course Code'))
     credits = models.IntegerField(verbose_name=_('Credits'))

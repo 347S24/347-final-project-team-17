@@ -63,8 +63,8 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 courses = extract_course_info(uploaded_file)
                 UserCourse.objects.filter(user=user).delete()
                 for course in courses:
-                    UserCourse.objects.create(user=user, code=course[0], credits=course[1], grade=course[2])
-                messages.success(request, f'{uploaded_file} uploaded successfully')
+                    UserCourse.objects.create(user=user, year=course[0], semester=course[1], code=course[2], credits=course[3], grade=course[4])
+                messages.success(request, uploaded_file)
 
         if "course_input_submit" in request.POST:
             if course_form.is_valid():
@@ -80,6 +80,11 @@ class UserUpdateView(LoginRequiredMixin, TemplateView):
                 UserCourse.objects.filter(id=course_id, user=user).delete()
                 messages.success(request, "Course removed successfully!")
                 return redirect(request.path_info)
+            
+        if "remove_all_submit" in request.POST:
+            UserCourse.objects.filter(user=user).delete()
+            messages.success(request, "All courses removed successfully!")
+            return redirect(request.path_info)
 
         return self.render_to_response({'update_form': update_form, 'transcript_form': transcript_form, 'course_form': course_form, 'user_courses': user_courses})
 
@@ -138,4 +143,3 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
-

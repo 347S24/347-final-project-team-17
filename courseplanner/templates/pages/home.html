@@ -1,1 +1,22 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home - CoursePlanner{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+  <h1 class="display-4">Welcome to CoursePlanner!</h1>
+  <p class="lead">Plan and organize your courses effortlessly.</p>
+  <hr class="my-4">
+
+  {% if request.user.is_authenticated %}
+  <p>
+    Download the <a href="{% static 'excel/template.xlsx' %}" class="btn btn-primary btn-lg" role="button">Excel Template</a> to get started.
+  </p>
+  {% else %}
+  <p>
+    Please <a href="{% url 'account_login' %}">Sign In</a> or <a href="{% url 'account_signup' %}">Sign Up</a> to download the Excel Template and start planning your courses.
+  </p>
+  {% endif %}
+</div>
+{% endblock content %}
