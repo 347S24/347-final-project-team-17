@@ -11,8 +11,9 @@ TARGET_CREDIT_HRS = 120  # Target total credit hours
 courses = ["CS 261", "CS 240", "CS 361", "CS 227", "CS 327", "CS 482", "CS 159", "CS 412", "CS 430", 
            "CS 149", "CS 456", "CS 470", "CS 432", "CS 457", "CS 458", "CS 459", "CS 145", "CS 345", 
            "CS 455", "CS 452", "MATH 231", "MATH 245", "MATH 227", "MATH 220", "MATH 229", "MATH 318", 
-           "MATH 232", "MATH 231"]
-credit_hours = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
+           "MATH 232", "ANTH 196", "ART 224", "PHYS 326", "HIS 100", "HTH 100", "BIO 440", "BIO 160", 
+           "ISAT 104", "ISCI 212", "BUS 160", "BUS 230", "BUS 400", "BUS 225", "BUS 346"]
+credit_hours = [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]
 
 # Create pairs of courses and credit hours, and shuffle them
 course_credit_pairs = sorted(zip(courses, credit_hours), key=lambda pair: int(pair[0].split()[1]))
