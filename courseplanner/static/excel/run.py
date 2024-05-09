@@ -2,6 +2,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 import shutil
 import random
+from datetime import datetime
 
 # Settings
 MAX_ENTRIES = 5  # Adjust this constant to set the maximum number of entries per header
@@ -57,13 +58,30 @@ def is_summer_above(worksheet, header_row, course_col):
             return True
     return False
 
-def update_excel(file_path, output_path, course_header="Course", credit_header="Credit Hrs", min_row=1, max_row=100):
+def find_and_update_personal_info(worksheet, name, email, date):
+    """Find the cells containing 'Name:', 'Email:', and 'Date:' and update the adjacent cells."""
+    for row in worksheet.iter_rows(values_only=False):
+        for cell in row:
+            if cell.value == "Name:":
+                worksheet.cell(row=cell.row, column=cell.column + 1).value = name
+            elif cell.value == "Email:":
+                worksheet.cell(row=cell.row, column=cell.column + 1).value = email
+            elif cell.value == "Date:":
+                worksheet.cell(row=cell.row, column=cell.column + 1).value = date
+
+def update_excel(file_path, output_path, name, email, course_header="Course", credit_header="Credit Hrs", min_row=1, max_row=100, summer=False):
     # Create a copy of the original file
     shutil.copy(file_path, output_path)
 
     # Load the copied workbook
     workbook = load_workbook(filename=output_path)
     worksheet = workbook.active
+
+    # Get the current date in American format
+    current_date = datetime.now().strftime("%m/%d/%Y")
+
+    # Update the personal information and date
+    find_and_update_personal_info(worksheet, name, email, current_date)
 
     # Find all pairs of 'Course' and 'Credit Hrs' headers
     header_pairs = find_all_header_pairs(worksheet, course_header, credit_header, min_row, max_row)
@@ -76,8 +94,8 @@ def update_excel(file_path, output_path, course_header="Course", credit_header="
 
     # Fill each header pair
     for header_row, course_col, credit_col in header_pairs:
-        if is_summer_above(worksheet, header_row, course_col):
-            continue  # Skip this section if 'Summer' is detected above
+        if not summer and is_summer_above(worksheet, header_row, course_col):
+            continue  # Skip this section if 'Summer' is detected above and summer is False
 
         row_count = 0
         while total_credits < TARGET_CREDIT_HRS and row_count < MAX_ENTRIES and pair_index < len(course_credit_pairs):
@@ -100,4 +118,6 @@ def update_excel(file_path, output_path, course_header="Course", credit_header="
 # Usage Example
 input_file_path = 'template.xlsx'
 output_file_path = 'template_copy.xlsx'
-update_excel(input_file_path, output_file_path, min_row=11, max_row=70)
+name = "John Doe"
+email = "john.doe@example.com"
+update_excel(input_file_path, output_file_path, name, email, min_row=11, max_row=70, summer=False)
